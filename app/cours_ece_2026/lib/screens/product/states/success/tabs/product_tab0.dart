@@ -5,6 +5,9 @@ import 'package:formation_flutter/res/app_colors.dart';
 import 'package:formation_flutter/res/app_icons.dart';
 import 'package:formation_flutter/res/app_theme_extension.dart';
 import 'package:provider/provider.dart';
+import 'package:formation_flutter/screens/product/widgets/recall_banner.dart';
+import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+
 
 class ProductTab0 extends StatelessWidget {
   const ProductTab0({super.key});
@@ -13,19 +16,25 @@ class ProductTab0 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        _Scores(),
-        Padding(
-          padding: EdgeInsetsDirectional.symmetric(
-            horizontal: _kHorizontalPadding,
-            vertical: 30.0,
-          ),
-          child: _Info(),
-        ),
-      ],
-    );
+    final recallState = context.watch<RecallFetcher>().state;
+
+return Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: <Widget>[
+
+    RecallBanner(state: recallState), // 👈 bandeau rappel
+
+    const _Scores(),
+
+    const Padding(
+      padding: EdgeInsetsDirectional.symmetric(
+        horizontal: _kHorizontalPadding,
+        vertical: 30.0,
+      ),
+      child: _Info(),
+    ),
+  ],
+);
   }
 }
 
@@ -60,6 +69,7 @@ class _Scores extends StatelessWidget {
                       flex: 44,
                       child: Padding(
                         padding: const EdgeInsetsDirectional.only(end: 5.0),
+                        
                         child: _Nutriscore(
                           nutriscore:
                               product.nutriScore ?? ProductNutriScore.unknown,
@@ -97,6 +107,8 @@ class _Scores extends StatelessWidget {
     );
   }
 }
+
+ 
 
 class _Nutriscore extends StatelessWidget {
   const _Nutriscore({required this.nutriscore});

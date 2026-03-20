@@ -5,6 +5,8 @@ import 'package:formation_flutter/screens/product/states/empty/product_page_empt
 import 'package:formation_flutter/screens/product/states/error/product_page_error.dart';
 import 'package:formation_flutter/screens/product/states/success/product_page_body.dart';
 import 'package:provider/provider.dart';
+import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+import 'package:formation_flutter/screens/product/favorites_fetcher.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key, required this.barcode})
@@ -17,8 +19,18 @@ class ProductPage extends StatelessWidget {
     final MaterialLocalizations materialLocalizations =
         MaterialLocalizations.of(context);
 
-    return ChangeNotifierProvider<ProductFetcher>(
-      create: (_) => ProductFetcher(barcode: barcode),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ProductFetcher>(
+          create: (_) => ProductFetcher(barcode: barcode),
+        ),
+        ChangeNotifierProvider<RecallFetcher>(
+          create: (_) => RecallFetcher(barcode: barcode),
+        ),
+        ChangeNotifierProvider<FavoritesFetcher>(
+          create: (_) => FavoritesFetcher(barcode: barcode),
+        ),
+      ],
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -34,6 +46,20 @@ class ProductPage extends StatelessWidget {
                 };
               },
             ),
+            Positioned(
+              bottom: 20,
+              left: 20,
+              child: Consumer<RecallFetcher>(
+                builder: (_, recall, __) {
+                  return switch (recall.state) {
+                    RecallLoading() => const Text('Rappel: chargement...'),
+                    RecallNone() => const Text('Rappel: aucun'),
+                    RecallFound() => const Text('Rappel: OUI'),
+                    RecallError() => const Text('Rappel: erreur'),
+                  };
+                },
+              ),
+            ),
             PositionedDirectional(
               top: 0.0,
               start: 0.0,
@@ -46,9 +72,16 @@ class ProductPage extends StatelessWidget {
             PositionedDirectional(
               top: 0.0,
               end: 0.0,
-              child: _HeaderIcon(
-                icon: AppIcons.share,
-                tooltip: materialLocalizations.shareButtonLabel,
+              child: Consumer<FavoritesFetcher>(
+                builder: (context, fav, _) {
+                  return _HeaderIcon(
+                    icon: fav.isFavorite ? Icons.star : Icons.star_border,
+                    tooltip: 'Favori',
+                    onPressed: () {
+                      fav.toggle();
+                    },
+                  );
+                },
               ),
             ),
           ],

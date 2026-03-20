@@ -10,6 +10,7 @@ import 'package:formation_flutter/screens/product/states/success/tabs/product_ta
 import 'package:formation_flutter/screens/product/states/success/tabs/product_tab3.dart';
 import 'package:provider/provider.dart';
 
+
 class ProductPageBody extends StatefulWidget {
   const ProductPageBody({super.key});
 

@@ -5,22 +5,41 @@ import 'package:formation_flutter/res/app_theme_extension.dart';
 import 'package:formation_flutter/screens/homepage/homepage_screen.dart';
 import 'package:formation_flutter/screens/product/product_page.dart';
 import 'package:go_router/go_router.dart';
-
+import 'test_pocketbase.dart';
+import 'package:formation_flutter/screens/recall/recall_page.dart';
+import 'package:formation_flutter/screens/auth/login_page.dart';
+import 'package:formation_flutter/screens/history/history_page.dart';
+import 'package:formation_flutter/screens/favorites/favorites_page.dart';
 void main() {
+  //estPocketBase();
   runApp(const MyApp());
 }
 
 GoRouter _router = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (_, _) => HomePage()),
+    GoRoute(
+      path: '/',
+      builder: (_, _) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (_, _) => HomePage(),
+    ),
     GoRoute(
       path: '/product',
       builder: (_, GoRouterState state) =>
           ProductPage(barcode: state.extra as String),
     ),
+    GoRoute(
+      path: '/recall',
+      builder: (_, state) => RecallPage(recordId: state.extra as String),
+    ),
+    GoRoute(
+  path: '/favorites',
+  builder: (_, __) => const FavoritesPage(),
+),
   ],
 );
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

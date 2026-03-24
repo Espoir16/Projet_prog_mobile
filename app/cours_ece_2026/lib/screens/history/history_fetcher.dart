@@ -21,12 +21,17 @@ class HistoryFetcher extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      final records = await pb
+      final fetchedRecords = await pb
           .collection('scan_history')
-          .getFullList(
-            sort: '-scanned_at',
-            filter: 'user="${pb.authStore.model!.id}"',
-          );
+          .getFullList(sort: '-scanned_at');
+      final userId = pb.authStore.model!.id;
+      final records = fetchedRecords.where((record) {
+        final relationValues = record.getListValue<String>('user');
+        if (relationValues.contains(userId)) return true;
+
+        final directValue = record.data['user']?.toString();
+        return directValue == userId;
+      }).toList(growable: false);
 
       _state = HistorySuccess(records);
     } catch (e) {

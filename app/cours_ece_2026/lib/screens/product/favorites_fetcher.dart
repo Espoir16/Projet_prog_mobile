@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formation_flutter/api/open_food_facts_api.dart';
 import '../../pocketbase_error_utils.dart';
 import '../../test_pocketbase.dart';
 

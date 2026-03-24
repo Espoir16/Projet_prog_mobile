@@ -1,0 +1,50 @@
+# PocketBase Server - Git Ignore
+
+# ============================================================================
+# ❌ À IGNORER : données locales (pb_data/)
+# ============================================================================
+
+# Base de données SQLite locale
+pb_data/data.db
+pb_data/auxiliary.db
+
+# Types TypeScript générés
+pb_data/types.d.ts
+
+# Fichiers temporaires et de backup
+pb_data/temp/
+pb_data/backups/
+
+# ============================================================================
+# ✅ À VERSIONNER : configuration & code
+# ============================================================================
+
+# Hooks JavaScript
+!pb_hooks/
+!pb_hooks/main.js
+
+# Documentation
+!README.md
+!COLLECTION_SETUP.md
+
+# PocketBase exécutable (optionnel si petit)
+# pocketbase.exe - selon la taille, peut être ignoré ou versionné
+
+# ============================================================================
+# 🔧 Fichiers système à ignorer
+# ============================================================================
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (si tu ajoutes npm tools plus tard)
+node_modules/
+package-lock.json

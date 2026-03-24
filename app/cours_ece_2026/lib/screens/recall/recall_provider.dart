@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+import '../../test_pocketbase.dart';
 
 sealed class RecallUiState {}
 
@@ -32,7 +33,7 @@ class RecallProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final record = await pb.collection('rappels').getOne(recordId);
+      final record = await pb.collection('recalls').getOne(recordId);
       _state = RecallUiData(record: record);
     } catch (e) {
       _state = RecallUiError(e);

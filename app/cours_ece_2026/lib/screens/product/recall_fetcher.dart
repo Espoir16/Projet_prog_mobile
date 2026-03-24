@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pocketbase/pocketbase.dart';
-
-final pb = PocketBase('http://127.0.0.1:8090');
+import '../../test_pocketbase.dart';
 
 class RecallFetcher extends ChangeNotifier {
   RecallFetcher({required String barcode})
-      : _barcode = barcode,
-        _state = RecallLoading() {
+    : _barcode = barcode,
+      _state = RecallLoading() {
     loadRecall();
   }
 
@@ -20,11 +18,13 @@ class RecallFetcher extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await pb.collection('rappels').getList(
-        page: 1,
-        perPage: 1,
-        filter: 'gtin="$_barcode" && actif=true',
-      );
+      final result = await pb
+          .collection('recalls')
+          .getList(
+            page: 1,
+            perPage: 1,
+            filter: 'barcode="$_barcode"',
+          );
 
       if (result.items.isEmpty) {
         _state = RecallNone();

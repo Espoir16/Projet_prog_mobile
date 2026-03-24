@@ -46,20 +46,6 @@ class ProductPage extends StatelessWidget {
                 };
               },
             ),
-            Positioned(
-              bottom: 20,
-              left: 20,
-              child: Consumer<RecallFetcher>(
-                builder: (_, recall, __) {
-                  return switch (recall.state) {
-                    RecallLoading() => const Text('Rappel: chargement...'),
-                    RecallNone() => const Text('Rappel: aucun'),
-                    RecallFound() => const Text('Rappel: OUI'),
-                    RecallError() => const Text('Rappel: erreur'),
-                  };
-                },
-              ),
-            ),
             PositionedDirectional(
               top: 0.0,
               start: 0.0,

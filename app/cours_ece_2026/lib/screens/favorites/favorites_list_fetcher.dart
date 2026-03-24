@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
-import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+import '../../pocketbase_error_utils.dart';
+import '../../test_pocketbase.dart';
 
 class FavoritesListFetcher extends ChangeNotifier {
   FavoritesListFetcher() {
@@ -12,14 +13,25 @@ class FavoritesListFetcher extends ChangeNotifier {
 
   Future<void> load() async {
     try {
-      final records = await pb.collection('favorites').getFullList(
-        filter: 'user="${pb.authStore.model.id}"',
-        sort: '-created',
-      );
+      if (!pb.authStore.isValid || pb.authStore.model == null) {
+        _state = FavoritesListSuccess([]);
+        notifyListeners();
+        return;
+      }
+      final records = await pb
+          .collection('favorites')
+          .getFullList(
+            filter: 'user="${pb.authStore.model!.id}"',
+            sort: '-created',
+          );
 
       _state = FavoritesListSuccess(records);
     } catch (e) {
-      _state = FavoritesListError(e);
+      if (isMissingCollectionError(e)) {
+        _state = FavoritesListSuccess([]);
+      } else {
+        _state = FavoritesListError(e);
+      }
     }
 
     notifyListeners();

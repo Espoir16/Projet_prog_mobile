@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+import '../../pocketbase_error_utils.dart';
+import '../../test_pocketbase.dart';
 
 class HomeFetcher extends ChangeNotifier {
   HomeFetcher() : _state = HomeLoading() {
@@ -12,10 +14,17 @@ class HomeFetcher extends ChangeNotifier {
 
   Future<void> load() async {
     try {
-      final records = await pb.collection('scan_history').getFullList(
-        filter: 'user="${pb.authStore.model.id}"',
-        sort: '-scanned_at',
-      );
+      if (!pb.authStore.isValid || pb.authStore.model == null) {
+        // Pas d'utilisateur connecté : on garde l'état vide.
+        _state = HomeEmpty();
+        notifyListeners();
+        return;
+      }
+
+      final userId = pb.authStore.model!.id;
+      final records = await pb
+          .collection('scan_history')
+          .getFullList(filter: 'user="$userId"', sort: '-scanned_at');
 
       if (records.isEmpty) {
         _state = HomeEmpty();
@@ -23,7 +32,11 @@ class HomeFetcher extends ChangeNotifier {
         _state = HomeHistory(records);
       }
     } catch (e) {
-      _state = HomeError(e);
+      if (isMissingCollectionError(e)) {
+        _state = HomeEmpty();
+      } else {
+        _state = HomeError(e);
+      }
     }
 
     notifyListeners();

@@ -11,7 +11,11 @@ class HomePageEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context)!;
+    final localizations = AppLocalizations.of(context);
+    final desc =
+        localizations?.my_scans_screen_description ??
+        'Aucun scan pour le moment. Effectuez votre premier scan !';
+    final buttonText = localizations?.my_scans_screen_button ?? 'Scanner';
 
     return Center(
       child: Column(
@@ -24,10 +28,7 @@ class HomePageEmpty extends StatelessWidget {
             flex: 20,
             child: Column(
               children: <Widget>[
-                Text(
-                  localizations.my_scans_screen_description,
-                  textAlign: TextAlign.center,
-                ),
+                Text(desc, textAlign: TextAlign.center),
                 Spacer(flex: 5),
                 FractionallySizedBox(
                   widthFactor: 0.5,
@@ -42,11 +43,7 @@ class HomePageEmpty extends StatelessWidget {
                     onPressed: onScan,
                     child: Row(
                       children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            localizations.my_scans_screen_button.toUpperCase(),
-                          ),
-                        ),
+                        Expanded(child: Text(buttonText.toUpperCase())),
                         const SizedBox(width: 10.0),
                         Icon(Icons.arrow_forward_outlined),
                       ],

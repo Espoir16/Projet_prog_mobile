@@ -56,19 +56,64 @@ class _RecallContent extends StatelessWidget {
   final Future<void> Function(String url) openUrl;
   final String Function(String? iso) fmtDate;
 
+  String _firstNonEmpty(List<String> values) {
+    for (final value in values) {
+      if (value.trim().isNotEmpty) return value;
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final imgUrl = record.getStringValue('liens_vers_les_images');
-    final dateDebut = record.getStringValue('date_debut_commercialisation');
-    final dateFin = record.getStringValue('date_date_fin_commercialisation');
-    final distributeurs = record.getStringValue('distributeurs');
-    final zone = record.getStringValue('zone_geographique_de_vente');
-    final motif = record.getStringValue('motif_rappel');
-    final risques = record.getStringValue('risques_encourus');
-    final infos = record.getStringValue('informations_complementaires');
-    final conduite =
-        record.getStringValue('conduites_a_tenir_par_le_consommateur');
-    final pdfUrl = record.getStringValue('lien_vers_affichette_pdf');
+    final productName = _firstNonEmpty([
+      record.getStringValue('product_name'),
+      record.getStringValue('nom_du_produit'),
+    ]);
+    final brand = _firstNonEmpty([
+      record.getStringValue('brand'),
+      record.getStringValue('marque'),
+    ]);
+    final imgUrl = _firstNonEmpty([
+      record.getStringValue('image_url'),
+      record.getStringValue('liens_vers_les_images'),
+    ]);
+    final dateDebut = _firstNonEmpty([
+      record.getStringValue('publication_date'),
+      record.getStringValue('date_debut_commercialisation'),
+    ]);
+    final dateFin = _firstNonEmpty([
+      record.getStringValue('end_date'),
+      record.getStringValue('date_fin_commercialisation'),
+      record.getStringValue('date_date_fin_commercialisation'),
+    ]);
+    final distributeurs = _firstNonEmpty([
+      record.getStringValue('distributors'),
+      record.getStringValue('distributeurs'),
+    ]);
+    final zone = _firstNonEmpty([
+      record.getStringValue('geographic_area'),
+      record.getStringValue('zone_geographique_de_vente'),
+    ]);
+    final motif = _firstNonEmpty([
+      record.getStringValue('reason'),
+      record.getStringValue('motif_rappel'),
+    ]);
+    final risques = _firstNonEmpty([
+      record.getStringValue('risk'),
+      record.getStringValue('risques_encourus'),
+    ]);
+    final infos = _firstNonEmpty([
+      record.getStringValue('additional_info'),
+      record.getStringValue('informations_complementaires'),
+    ]);
+    final conduite = _firstNonEmpty([
+      record.getStringValue('consumer_advice'),
+      record.getStringValue('conduites_a_tenir_par_le_consommateur'),
+    ]);
+    final pdfUrl = _firstNonEmpty([
+      record.getStringValue('source_url'),
+      record.getStringValue('lien_vers_affichette_pdf'),
+    ]);
 
     return Scaffold(
       appBar: AppBar(
@@ -83,6 +128,36 @@ class _RecallContent extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            if (productName.isNotEmpty || brand.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+                child: Column(
+                  children: [
+                    if (productName.isNotEmpty)
+                      Text(
+                        productName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    if (brand.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          brand,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
             if (imgUrl.trim().isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pocketbase/pocketbase.dart';
-import 'package:formation_flutter/screens/product/recall_fetcher.dart';
+import '../../pocketbase_error_utils.dart';
+import '../../test_pocketbase.dart';
 
 class HistoryFetcher extends ChangeNotifier {
   HistoryFetcher() : _state = HistoryLoading() {
@@ -15,14 +16,25 @@ class HistoryFetcher extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final records = await pb.collection('scan_history').getFullList(
-        sort: '-scanned_at',
-        filter: 'user="${pb.authStore.model.id}"',
-      );
+      if (!pb.authStore.isValid || pb.authStore.model == null) {
+        _state = HistorySuccess([]);
+        notifyListeners();
+        return;
+      }
+      final records = await pb
+          .collection('scan_history')
+          .getFullList(
+            sort: '-scanned_at',
+            filter: 'user="${pb.authStore.model!.id}"',
+          );
 
       _state = HistorySuccess(records);
     } catch (e) {
-      _state = HistoryError(e);
+      if (isMissingCollectionError(e)) {
+        _state = HistorySuccess([]);
+      } else {
+        _state = HistoryError(e);
+      }
     }
 
     notifyListeners();

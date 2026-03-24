@@ -18,10 +18,10 @@ dependencies:
   intl: any
 
   # UI
-  flutter_svg: 2.2.3
+  flutter_svg: ^2.2.4
   sliver_tools: 0.2.12
   provider: 6.1.5+1
-  dio: 5.9.1
+  dio: ^5.9.2
   go_router: 17.1.0
 
 dev_dependencies:

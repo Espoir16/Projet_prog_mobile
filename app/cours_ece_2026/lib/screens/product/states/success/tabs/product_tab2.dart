@@ -42,9 +42,9 @@ class ProductTab2 extends StatelessWidget {
     ].where((card) => card.nutriment != null).toList(growable: false);
 
     if (cards.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(
           child: Text(
             'Informations nutritionnelles indisponibles.',
             textAlign: TextAlign.center,
@@ -53,11 +53,16 @@ class ProductTab2 extends StatelessWidget {
       );
     }
 
-    return ListView.separated(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      itemCount: cards.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 14),
-      itemBuilder: (context, index) => _NutritionCard(card: cards[index]),
+      child: Column(
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            _NutritionCard(card: cards[i]),
+            if (i < cards.length - 1) const SizedBox(height: 14),
+          ],
+        ],
+      ),
     );
   }
 

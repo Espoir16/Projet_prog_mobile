@@ -18,155 +18,222 @@ class _LoginPageState extends State<LoginPage> {
   bool isSignupMode = false;
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AuthFetcher(),
       child: Scaffold(
-        backgroundColor: AppColors.grey1,
+        backgroundColor: AppColors.white,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Consumer<AuthFetcher>(
-              builder: (context, auth, _) {
-                final state = auth.state;
+          child: Consumer<AuthFetcher>(
+            builder: (context, auth, _) {
+              final state = auth.state;
 
-                if (state is AuthSuccess) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    context.go('/home');
-                  });
-                }
+              if (state is AuthSuccess) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  context.go('/home');
+                });
+              }
 
-                return SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 40),
-                      Text(
-                        isSignupMode ? 'Inscription' : 'Connexion',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppColors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 26,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        color: AppColors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(18),
-                          child: Column(
-                            children: [
-                              TextField(
-                                controller: emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.email_outlined,
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: constraints.maxHeight * 0.37,
+                              child: Center(
+                                child: Text(
+                                  isSignupMode ? 'Inscription' : 'Connexion',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
                                     color: AppColors.blue,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 22,
                                   ),
-                                  hintText: 'Adresse email',
-                                  border: OutlineInputBorder(),
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              TextField(
-                                controller: passwordController,
-                                obscureText: true,
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: AppColors.blue,
-                                  ),
-                                  hintText: 'Mot de passe',
-                                  border: OutlineInputBorder(),
+                            ),
+                            _AuthTextField(
+                              controller: emailController,
+                              hintText: 'Adresse email',
+                              icon: Icons.email,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 12),
+                            _AuthTextField(
+                              controller: passwordController,
+                              hintText: 'Mot de passe',
+                              icon: Icons.lock,
+                              obscureText: true,
+                            ),
+                            const SizedBox(height: 34),
+                            if (state is AuthError)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Text(
+                                  state.message,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: Colors.red),
                                 ),
                               ),
-                              const SizedBox(height: 24),
-                              if (state is AuthError)
-                                Column(
-                                  children: [
-                                    Text(
-                                      state.message,
-                                      style: const TextStyle(color: Colors.red),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 12),
-                                  ],
-                                ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.yellow,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-                                ),
+                            if (isSignupMode)
+                              _AuthButton(
+                                label: 'S\'inscrire',
+                                onPressed: state is AuthLoading
+                                    ? null
+                                    : () => _submit(auth, signup: true),
+                              )
+                            else ...[
+                              _AuthButton(
+                                label: 'Créer un compte',
                                 onPressed: state is AuthLoading
                                     ? null
                                     : () {
-                                        final email = emailController.text
-                                            .trim();
-                                        final password = passwordController.text
-                                            .trim();
-
-                                        if (isSignupMode) {
-                                          auth.signup(
-                                            email: email,
-                                            password: password,
-                                          );
-                                        } else {
-                                          auth.login(
-                                            email: email,
-                                            password: password,
-                                          );
-                                        }
+                                        setState(() => isSignupMode = true);
                                       },
-                                child: Text(
-                                  isSignupMode ? 'S\'inscrire' : 'Se connecter',
-                                  style: const TextStyle(
-                                    color: AppColors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 14),
+                              _AuthButton(
+                                label: 'Se connecter',
+                                onPressed: state is AuthLoading
+                                    ? null
+                                    : () => _submit(auth, signup: false),
+                              ),
+                            ],
+                            const SizedBox(height: 18),
+                            if (isSignupMode)
                               TextButton(
                                 onPressed: state is AuthLoading
                                     ? null
                                     : () {
-                                        setState(
-                                          () => isSignupMode = !isSignupMode,
-                                        );
+                                        setState(() => isSignupMode = false);
                                       },
-                                child: Text(
-                                  isSignupMode
-                                      ? 'Déjà un compte ? Se connecter'
-                                      : 'Pas de compte ? Créer un compte',
-                                  style: const TextStyle(
-                                    color: AppColors.blueDark,
-                                  ),
+                                child: const Text(
+                                  'Deja un compte ? Se connecter',
+                                  style: TextStyle(color: AppColors.blueDark),
                                 ),
                               ),
+                            if (state is AuthLoading) ...[
                               const SizedBox(height: 12),
-                              if (state is AuthLoading)
-                                const CircularProgressIndicator(),
+                              const CircularProgressIndicator(),
                             ],
-                          ),
+                            const SizedBox(height: 24),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
+        ),
+      ),
+    );
+  }
+
+  void _submit(AuthFetcher auth, {required bool signup}) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (signup) {
+      auth.signup(email: email, password: password);
+    } else {
+      auth.login(email: email, password: password);
+    }
+  }
+}
+
+class _AuthTextField extends StatelessWidget {
+  const _AuthTextField({
+    required this.controller,
+    required this.hintText,
+    required this.icon,
+    this.keyboardType,
+    this.obscureText = false,
+  });
+
+  final TextEditingController controller;
+  final String hintText;
+  final IconData icon;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: AppColors.blue),
+        hintText: hintText,
+        hintStyle: const TextStyle(color: AppColors.grey2),
+        filled: true,
+        fillColor: AppColors.white,
+        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFD9DCE6)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.blue),
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthButton extends StatelessWidget {
+  const _AuthButton({required this.label, this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 176,
+      height: 40,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.yellow,
+          foregroundColor: AppColors.blue,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                softWrap: false,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            const Icon(Icons.arrow_forward, size: 22),
+          ],
         ),
       ),
     );

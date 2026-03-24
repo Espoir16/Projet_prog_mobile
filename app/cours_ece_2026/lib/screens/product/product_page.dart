@@ -8,11 +8,19 @@ import 'package:provider/provider.dart';
 import 'package:formation_flutter/screens/product/recall_fetcher.dart';
 import 'package:formation_flutter/screens/product/favorites_fetcher.dart';
 
+class ProductPageArgs {
+  const ProductPageArgs({required this.barcode, this.recordScan = false});
+
+  final String barcode;
+  final bool recordScan;
+}
+
 class ProductPage extends StatelessWidget {
-  const ProductPage({super.key, required this.barcode})
+  const ProductPage({super.key, required this.barcode, this.recordScan = false})
     : assert(barcode.length > 0);
 
   final String barcode;
+  final bool recordScan;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +30,10 @@ class ProductPage extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<ProductFetcher>(
-          create: (_) => ProductFetcher(barcode: barcode),
+          create: (_) => ProductFetcher(
+            barcode: barcode,
+            recordScan: recordScan,
+          ),
         ),
         ChangeNotifierProvider<RecallFetcher>(
           create: (_) => RecallFetcher(barcode: barcode),

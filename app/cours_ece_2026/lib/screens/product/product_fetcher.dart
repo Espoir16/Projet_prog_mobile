@@ -5,13 +5,15 @@ import '../../pocketbase_error_utils.dart';
 import '../../test_pocketbase.dart';
 
 class ProductFetcher extends ChangeNotifier {
-  ProductFetcher({required String barcode})
+  ProductFetcher({required String barcode, required bool recordScan})
     : _barcode = barcode,
+      _recordScan = recordScan,
       _state = ProductFetcherLoading() {
     loadProduct();
   }
 
   final String _barcode;
+  final bool _recordScan;
   ProductFetcherState _state;
 
   Future<void> loadProduct() async {
@@ -24,7 +26,7 @@ class ProductFetcher extends ChangeNotifier {
       _state = ProductFetcherSuccess(product);
       notifyListeners();
 
-      if (pb.authStore.isValid && pb.authStore.model != null) {
+      if (_recordScan && pb.authStore.isValid && pb.authStore.model != null) {
         try {
           await pb
               .collection('scan_history')

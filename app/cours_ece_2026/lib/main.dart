@@ -31,8 +31,17 @@ GoRouter _router = GoRouter(
     GoRoute(path: '/scan', builder: (_, __) => const ScanPage()),
     GoRoute(
       path: '/product',
-      builder: (_, GoRouterState state) =>
-          ProductPage(barcode: state.extra as String),
+      builder: (_, GoRouterState state) {
+        final extra = state.extra;
+        if (extra is ProductPageArgs) {
+          return ProductPage(
+            barcode: extra.barcode,
+            recordScan: extra.recordScan,
+          );
+        }
+
+        return ProductPage(barcode: extra as String);
+      },
     ),
     GoRoute(
       path: '/recall',

@@ -3,6 +3,7 @@ import 'package:formation_flutter/model/product.dart';
 import 'package:formation_flutter/res/app_colors.dart';
 import 'package:formation_flutter/res/app_icons.dart';
 import 'package:formation_flutter/screens/homepage/homepage_empty.dart';
+import 'package:formation_flutter/screens/product/product_page.dart';
 import 'package:go_router/go_router.dart';
 import '../../test_pocketbase.dart';
 import 'package:formation_flutter/screens/homepage/home_fetcher.dart';
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _openProduct(BuildContext context, String barcode) async {
-    await context.push('/product', extra: barcode);
+    await context.push('/product', extra: ProductPageArgs(barcode: barcode));
     if (!context.mounted) return;
     await _fetcher.load();
   }

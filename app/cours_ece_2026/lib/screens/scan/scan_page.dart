@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formation_flutter/screens/product/product_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -18,6 +19,15 @@ class _ScanPageState extends State<ScanPage> {
 
   bool _hasDetectedBarcode = false;
 
+  Future<void> _openDetectedProduct(String barcode) async {
+    await context.push(
+      '/product',
+      extra: ProductPageArgs(barcode: barcode, recordScan: true),
+    );
+    if (!mounted) return;
+    context.pop();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -35,7 +45,7 @@ class _ScanPageState extends State<ScanPage> {
       if (normalizedValue.isEmpty) continue;
 
       _hasDetectedBarcode = true;
-      context.pushReplacement('/product', extra: normalizedValue);
+      _openDetectedProduct(normalizedValue);
       return;
     }
   }
